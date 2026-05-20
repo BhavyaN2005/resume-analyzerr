@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Resume Analyzer</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+</head>
+<body>
+
+  <div class="page-wrapper">
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+      <div class="nav-brand">
+        <span class="brand-icon">&#9650;</span>
+        <span class="brand-name">ResumeAI</span>
+      </div>
+      <div class="nav-links">
+        <a href="#how">How it works</a>
+        <a href="#upload-section" class="nav-cta">Analyze now</a>
+      </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-content">
+        <div class="hero-badge">Powered by spaCy + scikit-learn</div>
+        <h1 class="hero-title">
+          Know exactly <span>where</span><br/>your resume stands
+        </h1>
+        <p class="hero-sub">
+          Upload your resume and get an instant ATS score, job role matches,
+          missing skills, and actionable tips — all analyzed locally with NLP.
+        </p>
+        <a href="#upload-section" class="hero-btn">Get my analysis &darr;</a>
+      </div>
+      <div class="hero-visual">
+        <div class="score-preview-card">
+          <div class="spc-label">ATS Score</div>
+          <div class="spc-score">82<span>/100</span></div>
+          <div class="spc-bar"><div class="spc-fill" style="width:82%"></div></div>
+          <div class="spc-roles">
+            <div class="spc-role"><span>Data Analyst</span><b>91%</b></div>
+            <div class="spc-role"><span>ML Engineer</span><b>78%</b></div>
+            <div class="spc-role"><span>Backend Dev</span><b>65%</b></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="how-section" id="how">
+      <h2 class="section-title">How it works</h2>
+      <div class="steps-row">
+        <div class="step-card">
+          <div class="step-num">01</div>
+          <div class="step-title">Upload resume</div>
+          <div class="step-desc">PDF, DOCX, or plain text — we extract all content automatically.</div>
+        </div>
+        <div class="step-arrow">&rarr;</div>
+        <div class="step-card">
+          <div class="step-num">02</div>
+          <div class="step-title">NLP analysis</div>
+          <div class="step-desc">spaCy extracts skills, entities, and experience signals from your text.</div>
+        </div>
+        <div class="step-arrow">&rarr;</div>
+        <div class="step-card">
+          <div class="step-num">03</div>
+          <div class="step-title">Role matching</div>
+          <div class="step-desc">TF-IDF + cosine similarity scores your resume against 10 job profiles.</div>
+        </div>
+        <div class="step-arrow">&rarr;</div>
+        <div class="step-card">
+          <div class="step-num">04</div>
+          <div class="step-title">Get results</div>
+          <div class="step-desc">Instant report: ATS score, missing skills, strengths, and fix tips.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- UPLOAD SECTION -->
+    <section class="upload-section" id="upload-section">
+      <div class="upload-container">
+
+        <div class="upload-left">
+          <h2 class="section-title left">Analyze your resume</h2>
+          <p class="upload-hint">Drop a file or paste your resume text below.</p>
+
+          <div class="drop-zone" id="dropZone">
+            <div class="dz-icon">&#8679;</div>
+            <div class="dz-title">Drag &amp; drop your resume</div>
+            <div class="dz-sub">PDF or DOCX &mdash; up to 5MB</div>
+            <label class="dz-btn" for="fileInput">Browse file</label>
+            <input type="file" id="fileInput" accept=".pdf,.docx,.txt" hidden/>
+          </div>
+
+          <div class="file-pill" id="filePill" style="display:none">
+            <span id="fileNameDisplay"></span>
+            <button class="pill-remove" id="removeFile">&times;</button>
+          </div>
+
+          <div class="or-divider"><span>or paste text</span></div>
+
+          <textarea
+            id="resumeText"
+            class="resume-textarea"
+            placeholder="Paste your resume content here..."></textarea>
+
+          <div class="jd-block">
+            <label class="jd-label" for="jdText">
+              Job description
+              <span class="optional-tag">optional</span>
+            </label>
+            <textarea
+              id="jdText"
+              class="jd-textarea"
+              placeholder="Paste the job description to get targeted analysis..."></textarea>
+          </div>
+
+          <button class="analyze-btn" id="analyzeBtn" onclick="analyzeResume()">
+            &#9654;&nbsp;&nbsp;Analyze resume
+          </button>
+          <div class="error-msg" id="errorMsg"></div>
+        </div>
+
+        <div class="upload-right">
+          <div class="tips-card">
+            <div class="tips-title">&#128161; Tips for best results</div>
+            <ul class="tips-list">
+              <li>Include your full skills section with specific technologies</li>
+              <li>List job titles and company names clearly</li>
+              <li>Add quantified achievements (e.g. "improved X by 30%")</li>
+              <li>Paste the job description for role-specific feedback</li>
+              <li>Use standard section headings: Experience, Education, Skills</li>
+            </ul>
+          </div>
+          <div class="stat-cards">
+            <div class="stat-card"><div class="stat-num">10+</div><div class="stat-label">Job profiles</div></div>
+            <div class="stat-card"><div class="stat-num">50+</div><div class="stat-label">Skill signals</div></div>
+            <div class="stat-card"><div class="stat-num">100%</div><div class="stat-label">Private</div></div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- LOADING OVERLAY -->
+    <div class="loading-overlay" id="loadingOverlay" style="display:none">
+      <div class="loading-box">
+        <div class="loader-ring"></div>
+        <div class="loader-msg" id="loaderMsg">Extracting text...</div>
+      </div>
+    </div>
+
+    <!-- RESULTS SECTION -->
+    <section class="results-section" id="resultsSection" style="display:none">
+      <div class="results-container">
+
+        <div class="results-header">
+          <h2>Your analysis report</h2>
+          <button class="reset-btn" onclick="resetApp()">&#8634; Analyze another</button>
+        </div>
+
+        <!-- ATS SCORE HERO -->
+        <div class="ats-hero" id="atsHero">
+          <div class="ats-ring-wrap">
+            <svg class="ats-ring" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="10"/>
+              <circle cx="60" cy="60" r="50" fill="none"
+                id="atsArc"
+                stroke="url(#ringGrad)"
+                stroke-width="10"
+                stroke-linecap="round"
+                stroke-dasharray="314"
+                stroke-dashoffset="314"
+                transform="rotate(-90 60 60)"/>
+              <defs>
+                <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#2dd4bf"/>
+                  <stop offset="100%" stop-color="#a78bfa"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="ats-num" id="atsNum">0</div>
+          </div>
+          <div class="ats-meta">
+            <div class="ats-title">ATS Compatibility Score</div>
+            <div class="ats-verdict" id="atsVerdict">—</div>
+            <div class="ats-detail" id="atsDetail">—</div>
+          </div>
+        </div>
+
+        <!-- SUMMARY CARDS -->
+        <div class="summary-cards" id="summaryCards"></div>
+
+        <!-- ROLE MATCHES -->
+        <div class="result-block">
+          <div class="rb-title">&#127919; Role compatibility</div>
+          <div class="roles-list" id="rolesList"></div>
+        </div>
+
+        <!-- MISSING SKILLS -->
+        <div class="result-block">
+          <div class="rb-title">&#9888; Missing skills</div>
+          <div class="skills-cloud" id="skillsCloud"></div>
+        </div>
+
+        <!-- FOUND SKILLS -->
+        <div class="result-block">
+          <div class="rb-title">&#10003; Skills detected</div>
+          <div class="skills-cloud found" id="foundSkills"></div>
+        </div>
+
+        <!-- TIPS -->
+        <div class="result-block">
+          <div class="rb-title">&#128161; Improvement tips</div>
+          <ul class="tips-result-list" id="tipsList"></ul>
+        </div>
+
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div>ResumeAI &mdash; Built with Flask, spaCy &amp; scikit-learn</div>
+    </footer>
+
+  </div>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
